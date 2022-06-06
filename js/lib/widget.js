@@ -1,6 +1,6 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-import { Viewer } from 'molstar/build/viewer/molstar';
+var molstart = require('molstar/build/viewer/molstar');
 
 // See example.py for the kernel counterpart to this file.
 
@@ -24,10 +24,11 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
     defaults: _.extend(widgets.DOMWidgetModel.prototype.defaults(), {
         _model_name : 'MolstarModel',
         _view_name : 'MolstarView',
-        _model_module : 'molstarview-widget',
-        _view_module : 'molstarview-widget',
+        _model_module : 'jupyter-widget-example',
+        _view_module : 'jupyter-widget-example',
         _model_module_version : '0.1.0',
         _view_module_version : '0.1.0',
+        value : 'Molstar World!'
     })
 });
 
@@ -36,23 +37,29 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
 var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
     render: function() {
+        this.value_changed();
+
         // Observe changes in the value traitlet in Python, and define
         // a custom callback.
-        // FIXME: molstar here
-        this.viewer = new Viewer('app', {
-            layoutIsExpanded: false,
-            layoutShowControls: false,
-            layoutShowRemoteState: false,
-            layoutShowSequence: true,
-            layoutShowLog: false,
-            layoutShowLeftPanel: true,
-            viewportShowExpand: true,
-            viewportShowSelectionMode: false,
-            viewportShowAnimation: false,
-            pdbProvider: 'rcsb',
-            emdbProvider: 'rcsb',
-        });
-        this.viewer.loadPdb('7bv2');  
+        this.model.on('change:value', this.value_changed, this);
+        //this.viewer = new Viewer('app', {
+        //    layoutIsExpanded: false,
+        //    layoutShowControls: false,
+        //    layoutShowRemoteState: false,
+        //    layoutShowSequence: true,
+        //    layoutShowLog: false,
+        //    layoutShowLeftPanel: true,
+        //    viewportShowExpand: true,
+        //    viewportShowSelectionMode: false,
+        //    viewportShowAnimation: false,
+        //    pdbProvider: 'rcsb',
+        //    emdbProvider: 'rcsb',
+        //});
+        //this.viewer.loadPdb('7bv2');  
+    },
+
+    value_changed: function() {
+        this.el.textContent = this.model.get('value');
     }
 });
 

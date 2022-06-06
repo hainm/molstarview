@@ -21,3 +21,4 @@ class MolstarView(widgets.DOMWidget):
     _view_module_version = Unicode('^0.1.0').tag(sync=True)
     # Version of the front-end module containing widget model
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
+    value = Unicode('Hello World!').tag(sync=True)

@@ -1,6 +1,6 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-var molstart = require('molstar/build/viewer/molstar');
+var molstar = require('molstar/build/viewer/molstar');
 
 // See example.py for the kernel counterpart to this file.
 

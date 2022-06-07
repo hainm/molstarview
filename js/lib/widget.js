@@ -1,6 +1,10 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-var molstar = require('molstar/build/viewer/molstar');
+// var { createPluginUI } require('molstar/lib/mol-plugin-ui');
+var molPluginUi =  require('molstar/lib/mol-plugin-ui');
+// var { DownloadStructure, PdbDownloadProvider } require('molstar/lib/mol-plugin-state/actions/structure');
+var molStructure = require('molstar/lib/mol-plugin-state/actions/structure');
+var molConfig = require('molstar/lib/mol-plugin/config');
 
 // See example.py for the kernel counterpart to this file.
 
@@ -36,31 +40,35 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
 // Custom View. Renders the widget model.
 var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
-    render: function() {
+    render: async function() {
+        this.plugin = await molPluginUi.createPluginUI(this.el);
+        // call it after the plugin has been initialized
         this.value_changed();
-
-        // Observe changes in the value traitlet in Python, and define
-        // a custom callback.
         this.model.on('change:value', this.value_changed, this);
-        //this.viewer = new Viewer('app', {
-        //    layoutIsExpanded: false,
-        //    layoutShowControls: false,
-        //    layoutShowRemoteState: false,
-        //    layoutShowSequence: true,
-        //    layoutShowLog: false,
-        //    layoutShowLeftPanel: true,
-        //    viewportShowExpand: true,
-        //    viewportShowSelectionMode: false,
-        //    viewportShowAnimation: false,
-        //    pdbProvider: 'rcsb',
-        //    emdbProvider: 'rcsb',
-        //});
-        //this.viewer.loadPdb('7bv2');  
     },
-
     value_changed: function() {
-        this.el.textContent = this.model.get('value');
-    }
+        this.loadPdb(this.model.get('value'));
+    },
+    loadPdb: function(pdb) {    
+        // this method is taken from the Viewer class
+        const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
+        const provider = this.plugin.config.get(molConfig.PluginConfig.Download.DefaultPdbProvider);
+        return this.plugin.runTask(this.plugin.state.data.applyAction(molStructure.DownloadStructure, {
+            source: {
+                name: 'pdb',
+                params: {
+                    provider: {
+                        id: pdb,
+                        server: {
+                            name: provider,
+                            params: molStructure.PdbDownloadProvider[provider].defaultValue
+                        }
+                    },
+                    options: { ...params.source.params.options },
+                }
+            }
+        }));
+    },
 });
 
 

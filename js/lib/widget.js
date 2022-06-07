@@ -1,10 +1,12 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
 // var { createPluginUI } require('molstar/lib/mol-plugin-ui');
-var molPluginUi =  require('molstar/lib/mol-plugin-ui');
 // var { DownloadStructure, PdbDownloadProvider } require('molstar/lib/mol-plugin-state/actions/structure');
-var molStructure = require('molstar/lib/mol-plugin-state/actions/structure');
 var molConfig = require('molstar/lib/mol-plugin/config');
+var molPluginUi =  require('molstar/lib/mol-plugin-ui');
+var molStructure = require('molstar/lib/mol-plugin-state/actions/structure');
+
+// require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue.
 
 // See example.py for the kernel counterpart to this file.
 
@@ -41,7 +43,12 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
 var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
     render: async function() {
-        this.plugin = await molPluginUi.createPluginUI(this.el);
+        this.handleMessage()
+        const container = document.createElement('div');
+        container.style.width = '800px';
+        container.style.height = '600px';
+        this.el.appendChild(container);
+        this.plugin = await molPluginUi.createPluginUI(container);
         // call it after the plugin has been initialized
         this.value_changed();
         this.model.on('change:value', this.value_changed, this);
@@ -68,6 +75,43 @@ var MolstarView = widgets.DOMWidgetView.extend({
                 }
             }
         }));
+    },
+    executeCode: function(code){
+        eval(code);
+    },
+    on_msg: function(msg){
+        if (msg.type == 'call_method') {
+            var index, component, func, stage;
+            var new_args = msg.args.slice();
+            new_args.push(msg.kwargs);
+        }
+        switch (msg.target) {
+            case 'Widget':
+                func = this[msg.methodName];
+                if (func) {
+                    func.apply(this, new_args);
+                } else {
+                    // send error message to Python?
+                    console.log('can not create func for ' + msg.methodName);
+                }
+                break;
+        }
+    },
+    handleMessage: function(){
+        this.model.on("msg:custom", function(msg){
+           this.on_msg(msg);
+        }, this);
+
+        if (this.model.comm) {
+            this.model.comm.on_msg(function(msg) {
+                var buffers = msg.buffers;
+                var content = msg.content.data.content;
+                if (buffers.length && content) {
+                    content.buffers = buffers;
+                }
+                this.model._handle_comm_msg.call(this.model, msg);
+            }.bind(this));
+        }
     },
 });
 

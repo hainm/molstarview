@@ -32,7 +32,9 @@
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
     "webpack": "^5",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "sass-loader": "^11.1.1",
+    "node-sass": "^6.0.0"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
@@ -49,7 +51,7 @@
       }
     },
     "_build": {
-      "load": "static/remoteEntry.fa58e416d70a080ff99c.js",
+      "load": "static/remoteEntry.798a8a1761985a5717e3.js",
       "extension": "./extension"
     }
   }

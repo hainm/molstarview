@@ -1,12 +1,9 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-// var { createPluginUI } require('molstar/lib/mol-plugin-ui');
-// var { DownloadStructure, PdbDownloadProvider } require('molstar/lib/mol-plugin-state/actions/structure');
 var molConfig = require('molstar/lib/mol-plugin/config');
 var molPluginUi =  require('molstar/lib/mol-plugin-ui');
 var molStructure = require('molstar/lib/mol-plugin-state/actions/structure');
-
-// require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue.
+require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue for labextension building.
 
 // See example.py for the kernel counterpart to this file.
 

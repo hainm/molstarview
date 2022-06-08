@@ -24,10 +24,12 @@ class MolstarView(widgets.DOMWidget):
     value = Unicode('Hello World!').tag(sync=True)
 
     def _js(self, code, **kwargs):
+        # nglview code
         self._remote_call('executeCode',
                           target='Widget',
                           args=[code],
                           **kwargs)
+
     def _remote_call(self,
                      method_name,
                      target='Widget',
@@ -35,6 +37,7 @@ class MolstarView(widgets.DOMWidget):
                      kwargs=None,
                      **other_kwargs):
 
+        # adapted from nglview
         msg = self._get_remote_call_msg(method_name,
                                         target=target,
                                         args=args,
@@ -48,6 +51,7 @@ class MolstarView(widgets.DOMWidget):
                              args=None,
                              kwargs=None,
                              **other_kwargs):
+        # adapted from nglview
         msg = {}
         msg['target'] = target
         msg['type'] = 'call_method'

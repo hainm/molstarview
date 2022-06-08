@@ -20,12 +20,10 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../molstarview/labextension/ && rimraf ../molstarview/nbextension",
+    "clean": "rimraf dist/ && rimraf ../molstarview/nbextension",
     "prepublish": "yarn run clean && yarn run build:prod",
-    "build": "webpack --mode=development && yarn run build:labextension:dev",
-    "build:prod": "webpack --mode=production && yarn run build:labextension",
-    "build:labextension": "jupyter labextension build .",
-    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build": "webpack --mode=development",
+    "build:prod": "webpack --mode=production",
     "watch": "webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -33,7 +31,7 @@
     "@jupyterlab/builder": "^3.0.0",
     "webpack": "^5",
     "rimraf": "^2.6.1",
-    "sass-loader": "^11.1.1",
+    "sass-loader": "^13",
     "node-sass": "^7.0.0"
   },
   "dependencies": {

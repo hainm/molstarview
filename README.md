@@ -1,7 +1,8 @@
 # NOTHING TO SEE YET. PLEASE COME BACK LATER
+# Codes are copied/adapted from nglview and molstar. Will update the licenses.
 
 molstarview-widget
-===============================
+==================
 
 molstarview
 

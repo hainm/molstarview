@@ -1,8 +1,10 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-var molConfig = require('molstar/lib/mol-plugin/config');
-var molPluginUi =  require('molstar/lib/mol-plugin-ui');
-var molStructure = require('molstar/lib/mol-plugin-state/actions/structure');
+// var molConfig = require('molstar/lib/mol-plugin/config');
+// var molPluginUi =  require('molstar/lib/mol-plugin-ui');
+import {PluginConfig} from 'molstar/lib/mol-plugin/config'
+import {createPluginUI} from 'molstar/lib/mol-plugin-ui'
+import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure'
 require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue for labextension building.
 
 // See example.py for the kernel counterpart to this file.
@@ -50,7 +52,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         container.style.width = '800px';
         container.style.height = '600px';
         this.el.appendChild(container);
-        this.plugin = await molPluginUi.createPluginUI(container);
+        this.plugin = await createPluginUI(container);
         // call it after the plugin has been initialized
         this.value_changed();
         this.model.on('change:value', this.value_changed, this);
@@ -61,7 +63,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
     loadPdb: function(pdb) {    
         // this method is taken from the Viewer class
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
-        const provider = this.plugin.config.get(molConfig.PluginConfig.Download.DefaultPdbProvider);
+        const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
         return this.plugin.runTask(this.plugin.state.data.applyAction(molStructure.DownloadStructure, {
             source: {
                 name: 'pdb',

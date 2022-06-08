@@ -41,6 +41,11 @@ var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
     render: async function() {
         this.handleMessage()
+        this.displayed.then(function(){
+            this.init()
+        }.bind(this))
+    },
+    init: async function(){
         const container = document.createElement('div');
         container.style.width = '800px';
         container.style.height = '600px';

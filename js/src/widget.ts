@@ -52,6 +52,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         container.style.width = '800px';
         container.style.height = '600px';
         this.el.appendChild(container);
+        this.molContainer = container;
         this.plugin = await createPluginUI(container);
         // call it after the plugin has been initialized
         this.value_changed();
@@ -61,6 +62,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         this.loadPdb(this.model.get('value'));
     },
     loadPdb(pdb) {    
+        // FIXME: move to different file?
         // this method is taken from the Viewer class
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
         const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
@@ -121,8 +123,11 @@ var MolstarView = widgets.DOMWidgetView.extend({
 
     exportImage(modelId){
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data){
-            var msg = {"type": "exportImage", "data": data}
-            this.model.send(msg)
+            console.log('data')
+            data = data.replace("data:image/png;base64,", "");
+            var msg = {"type": "exportImage", "data": data, "model_id": modelId}
+            console.log('model_id', modelId)
+            this.send(msg)
         }.bind(this))
     }
 });

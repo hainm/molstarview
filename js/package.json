@@ -22,8 +22,9 @@
   "scripts": {
     "clean": "rimraf dist/ && rimraf ../molstarview/nbextension",
     "prepublish": "yarn run clean && yarn run build:prod",
-    "build": "webpack --mode=development",
-    "build:prod": "webpack --mode=production",
+    "build": "tsc && webpack --mode=development",
+    "build:prod": "tsc && webpack --mode=production",
+    "build:lib": "tsc",
     "watch": "webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -32,7 +33,15 @@
     "webpack": "^5",
     "rimraf": "^2.6.1",
     "sass-loader": "^13",
-    "node-sass": "^7.0.0"
+    "node-sass": "^7.0.0",
+    "typescript": "~4.1.3",
+    "@types/chai": "^4.1.4",
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^2.2.48",
+    "@types/node": "^12.0.2",
+    "@types/requirejs": "^2.1.31",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",

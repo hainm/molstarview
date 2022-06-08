@@ -23,6 +23,17 @@ class MolstarView(widgets.DOMWidget):
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
     value = Unicode('Hello World!').tag(sync=True)
 
+    def render_image(self):
+        image = widgets.Image()
+        self._js(f"this.exportImage('image.model_id')")
+        return image
+
+    def _molview_handle_message(self, widget, msg, buffers):
+        msg_type = msg.get("type")
+        data = msg.get("data")
+        if msg_type == "exportImage":
+            print(data[:10])
+
     def _js(self, code, **kwargs):
         # nglview code
         self._remote_call('executeCode',

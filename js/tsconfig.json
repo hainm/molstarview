@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+      "noImplicitAny": false,
+      "lib": ["dom", "es5", "es2015.promise", "es2015.iterable"],
+      "noEmitOnError": false,
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "target": "es2015",
+      "outDir": "lib",
+      "skipLibCheck": true,
+      "strictNullChecks": false,
+      "inlineSourceMap": true,
+      "allowJs": true
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+          "node_modules",
+          "**/*.spec.ts"
+    ]
+  }

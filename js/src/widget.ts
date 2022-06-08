@@ -41,13 +41,13 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
 // Custom View. Renders the widget model.
 var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
-    render: async function() {
+    async render() {
         this.handleMessage()
         this.displayed.then(function(){
             this.init()
         }.bind(this))
     },
-    init: async function(){
+    async init(){
         const container = document.createElement('div');
         container.style.width = '800px';
         container.style.height = '600px';
@@ -57,10 +57,10 @@ var MolstarView = widgets.DOMWidgetView.extend({
         this.value_changed();
         this.model.on('change:value', this.value_changed, this);
     },
-    value_changed: function() {
+    value_changed() {
         this.loadPdb(this.model.get('value'));
     },
-    loadPdb: function(pdb) {    
+    loadPdb(pdb) {    
         // this method is taken from the Viewer class
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
         const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
@@ -80,10 +80,11 @@ var MolstarView = widgets.DOMWidgetView.extend({
             }
         }));
     },
-    executeCode: function(code){
+    executeCode(code){
         eval(code);
     },
-    on_msg: function(msg){
+
+    on_msg(msg){
         if (msg.type == 'call_method') {
             var index, component, func, stage;
             var new_args = msg.args.slice();
@@ -101,7 +102,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
                 break;
         }
     },
-    handleMessage: function(){
+    handleMessage(){
         this.model.on("msg:custom", function(msg){
            this.on_msg(msg);
         }, this);
@@ -118,12 +119,12 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
     },
 
-    exportImage: function(modelId){
+    exportImage(modelId){
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data){
             var msg = {"type": "exportImage", "data": data}
             this.model.send(msg)
         }.bind(this))
-    },
+    }
 });
 
 

@@ -1,5 +1,6 @@
 import ipywidgets as widgets
 from traitlets import Unicode
+import base64
 
 # See js/lib/widget.js for the frontend counterpart to this file.
 
@@ -26,13 +27,15 @@ class MolstarView(widgets.DOMWidget):
     def render_image(self):
         image = widgets.Image()
         self._js(f"this.exportImage('image.model_id')")
+        # image.value will be updated in _molview_handle_message
         return image
 
     def _molview_handle_message(self, widget, msg, buffers):
         msg_type = msg.get("type")
         data = msg.get("data")
         if msg_type == "exportImage":
-            print(data[:10])
+            image = widgets.Widget.widgets[msg.get("model_id")]
+            image.value = base64.b64decode(data)
 
     def _js(self, code, **kwargs):
         # nglview code

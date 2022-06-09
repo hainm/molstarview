@@ -31,17 +31,18 @@ class MolstarView(widgets.DOMWidget):
 
     def __init__(self):
         super().__init__()
+        self._molstar_component_ids = []
+        self._trajlist = []
         self._handle_msg_thread = threading.Thread(
-            target=self.on_msg, args=(self._molview_handle_message, ))
+            target=self.on_msg, args=(self._molstar_handle_message, ))
         # register to get data from JS side
         self._handle_msg_thread.daemon = True
         self._handle_msg_thread.start()
-        self._trajlist = []
 
     def render_image(self):
         image = widgets.Image()
         self._js(f"this.exportImage('{image.model_id}')")
-        # image.value will be updated in _molview_handle_message
+        # image.value will be updated in _molstar_handle_message
         return image
 
     def _load_structure_data(self, data: str, format: str = 'pdb'):
@@ -49,7 +50,7 @@ class MolstarView(widgets.DOMWidget):
                           target="Widget",
                           args=[data, format])
 
-    def _molview_handle_message(self, widget, msg, buffers):
+    def _molstar_handle_message(self, widget, msg, buffers):
         msg_type = msg.get("type")
         data = msg.get("data")
         if msg_type == "exportImage":
@@ -131,6 +132,7 @@ class MolstarView(widgets.DOMWidget):
             'type': 'binary_single',
             'data': coords_indices,
         }
+        print(msg, buffers)
         self.send(msg, buffers=buffers)
 
     @observe('frame')

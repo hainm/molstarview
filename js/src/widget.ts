@@ -69,9 +69,9 @@ var MolstarView = widgets.DOMWidgetView.extend({
         await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, 'default');
     },
 
+    // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
+    // this method is taken from the Viewer class
     loadPdb(pdb) {    
-        // FIXME: move to different file?
-        // this method is taken from the Viewer class
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
         const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
         return this.plugin.runTask(this.plugin.state.data.applyAction(molStructure.DownloadStructure, {
@@ -99,18 +99,33 @@ var MolstarView = widgets.DOMWidgetView.extend({
             var index, component, func, stage;
             var new_args = msg.args.slice();
             new_args.push(msg.kwargs);
-        }
-        switch (msg.target) {
-            case 'Widget':
-                func = this[msg.methodName];
-                if (func) {
-                    func.apply(this, new_args);
-                } else {
-                    // send error message to Python?
-                    console.log('can not create func for ' + msg.methodName);
+
+            switch (msg.target) {
+                case 'Widget':
+                    func = this[msg.methodName];
+                    if (func) {
+                        func.apply(this, new_args);
+                    } else {
+                        // send error message to Python?
+                        console.log('can not create func for ' + msg.methodName);
+                    }
+                    break;
+            }
+        } else if (msg.type == 'binary_single') {
+            var coordinateMeta = msg.data;
+            var coordinates
+            var i, traj_index;
+            var keys = Object.keys(coordinateMeta);
+
+            for (i = 0; i < keys.length; i++) {
+                traj_index = keys[i];
+                coordinates = new Float32Array(msg.buffers[i].buffer);
+                if (coordinates.byteLength > 0) {
+                    this.updateCoordinates(coordinates, traj_index);
                 }
-                break;
+            }
         }
+
     },
     handleMessage(){
         this.model.on("msg:custom", function(msg){
@@ -129,12 +144,20 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
     },
 
+    updateCoordinates(coordinates, modelIndex) {
+        // coordinates must be ArrayBuffer (use this.decode_base64)
+        // var component = ? // FIXME: update
+        var component = 0 // FIXME
+        if (coordinates && typeof component != 'undefined') {
+            var coords = new Float32Array(coordinates);
+            // FIXME: update
+        }
+    },
+
     exportImage(modelId){
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data){
-            console.log('data')
             data = data.replace("data:image/png;base64,", "");
             var msg = {"type": "exportImage", "data": data, "model_id": modelId}
-            console.log('model_id', modelId)
             this.send(msg)
         }.bind(this))
     }

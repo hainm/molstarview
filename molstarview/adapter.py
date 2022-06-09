@@ -17,11 +17,12 @@ class Structure:
         raise NotImplementedError()
 
 
-class Trajectory:
+class Trajectory(Structure):
     """abstract base class
     """
 
     def __init__(self):
+        super().__init__()
         self.id = str(uuid.uuid4())
         self.shown = True
 
@@ -33,7 +34,7 @@ class Trajectory:
         raise NotImplementedError()
 
 
-class SimpletrajTrajectory(Trajectory, Structure):
+class SimpletrajTrajectory(Trajectory):
 
     def __init__(self, path, structure_path):
         try:

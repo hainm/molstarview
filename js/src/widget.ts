@@ -5,6 +5,7 @@ var _ = require('lodash');
 import {PluginConfig} from 'molstar/lib/mol-plugin/config'
 import {createPluginUI} from 'molstar/lib/mol-plugin-ui'
 import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure'
+import { BuiltInTrajectoryFormat } from 'molstar/lib/mol-plugin-state/formats/trajectory'
 require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue for labextension building.
 
 // See example.py for the kernel counterpart to this file.
@@ -61,6 +62,13 @@ var MolstarView = widgets.DOMWidgetView.extend({
     value_changed() {
         this.loadPdb(this.model.get('value'));
     },
+    // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
+    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, options?: { dataLabel?: string }) {
+        const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
+        const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
+        await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, 'default');
+    },
+
     loadPdb(pdb) {    
         // FIXME: move to different file?
         // this method is taken from the Viewer class

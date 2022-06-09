@@ -39,6 +39,11 @@ class MolstarView(widgets.DOMWidget):
         # image.value will be updated in _molview_handle_message
         return image
 
+    def _load_pdb(self, data: str):
+        self._remote_call("loadStructureFromData",
+                target="Widget",
+                args=[data, "pdb"])
+
     def _molview_handle_message(self, widget, msg, buffers):
         msg_type = msg.get("type")
         data = msg.get("data")

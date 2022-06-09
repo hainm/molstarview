@@ -1,3 +1,4 @@
+# Code is copied/adapted from nglview
 import threading
 import base64
 import ipywidgets as widgets

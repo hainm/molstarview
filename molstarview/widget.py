@@ -2,7 +2,8 @@
 import threading
 import base64
 import ipywidgets as widgets
-from traitlets import Unicode
+from traitlets import (Bool, CaselessStrEnum, Dict, Instance, Int, Integer,
+                       List, Unicode, observe, validate)
 
 # See js/lib/widget.js for the frontend counterpart to this file.
 
@@ -122,18 +123,14 @@ class MolstarView(widgets.DOMWidget):
         self._coordinates_dict = arr_dict
 
         buffers = []
-        coordinates_meta = dict()
+        coords_indices = dict()
         for index, arr in self._coordinates_dict.items():
             buffers.append(arr.astype('f4').tobytes())
-            coordinates_meta[index] = index
+            coords_indices[index] = index
         msg = {
             'type': 'binary_single',
-            'data': coordinates_meta,
+            'data': coords_indices,
         }
-        if movie_making:
-            msg['movie_making'] = movie_making
-            msg['render_params'] = render_params
-
         self.send(msg, buffers=buffers)
 
     @observe('frame')

@@ -8,6 +8,8 @@ import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure'
 import { BuiltInTrajectoryFormat } from 'molstar/lib/mol-plugin-state/formats/trajectory'
 require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue for labextension building.
 
+// import { updateModelCoordinates } from "./coords" // FIXME: wrong
+import { basicSpec } from "./ui" // FIXME: wrong
 // See example.py for the kernel counterpart to this file.
 
 
@@ -51,10 +53,10 @@ var MolstarView = widgets.DOMWidgetView.extend({
     async init(){
         const container = document.createElement('div');
         container.style.width = '800px';
-        container.style.height = '600px';
+        container.style.height = '400px';
         this.el.appendChild(container);
         this.molContainer = container;
-        this.plugin = await createPluginUI(container);
+        this.plugin = await createPluginUI(container, basicSpec);
         // call it after the plugin has been initialized
         this.value_changed();
         this.model.on('change:value', this.value_changed, this);
@@ -145,13 +147,9 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     updateCoordinates(coordinates, modelIndex) {
-        // coordinates must be ArrayBuffer (use this.decode_base64)
-        // var component = ? // FIXME: update
-        var component = 0 // FIXME
-        if (coordinates && typeof component != 'undefined') {
-            var coords = new Float32Array(coordinates);
-            // FIXME: update
-        }
+        var coords = new Float32Array(coordinates);
+        // updateModelCoordinates(this.plugin, coords, modelIndex);
+        console.log("nothing")
     },
 
     exportImage(modelId){

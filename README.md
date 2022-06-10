@@ -4,7 +4,7 @@
 molstarview-widget
 ==================
 
-- molstarview
+- molstarview: See the `dev` branch for now.
 - Similar package(s) that was bornt before `molstarview`:
     - https://github.com/janash/pymolstar
 

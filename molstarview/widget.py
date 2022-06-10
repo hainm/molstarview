@@ -45,14 +45,6 @@ class MolstarView(widgets.DOMWidget):
         # image.value will be updated in _molstar_handle_message
         return image
 
-    def add_trajectory(self, trajectory):
-        self._load_structure_data(trajectory.get_structure_string(),
-                                  'pdb')  # FIXME
-        self._trajlist.append(trajectory)
-        self._update_max_frame()
-        self._molstar_component_ids.append(trajectory.id)
-
-
     def _load_structure_data(self, data: str, format: str = 'pdb'):
         self._remote_call("loadStructureFromData",
                           target="Widget",
@@ -102,6 +94,13 @@ class MolstarView(widgets.DOMWidget):
         msg['kwargs'] = kwargs
         return msg
 
+    def add_trajectory(self, trajectory):
+        self._load_structure_data(trajectory.get_structure_string(),
+                                  'pdb')  # FIXME
+        self._trajlist.append(trajectory)
+        self._update_max_frame()
+        self._molstar_component_ids.append(trajectory.id)
+
     def _update_max_frame(self):
         self.max_frame = max(
             int(traj.n_frames) for traj in self._trajlist
@@ -133,6 +132,7 @@ class MolstarView(widgets.DOMWidget):
             'type': 'binary_single',
             'data': coords_indices,
         }
+        print(msg, buffers)
         self.send(msg, buffers=buffers)
 
     @observe('frame')

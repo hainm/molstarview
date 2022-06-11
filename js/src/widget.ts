@@ -47,19 +47,64 @@ var MolstarView = widgets.DOMWidgetView.extend({
     async render() {
         this.handleMessage()
         this.displayed.then(async function(){
-            await this.init()
-            this.finalizeDisplay()
+            await this.initializeDisplay()
+            await this.finalizeDisplay()
         }.bind(this))
     },
-    async init(){
+    async initializeDisplay(){
         const container = document.createElement('div');
         container.style.width = '800px';
         container.style.height = '600px';
         this.el.appendChild(container);
         this.molContainer = container;
         this.plugin = await createPluginUI(container);
+
+        // FIXME: make a new function called "restoreStateIfNeeded"?
+        // Find "leader" view
+        // Other views need to be reconstructed based on leader view
+        console.log('Find a leader view')
+        this.isLeader = false
+        if (this.model.views.length < 2) {
+            this.isLeader = true
+        }
+        var hasLeader = false
+        for (var k in this.model.views){
+            console.log('k', k, typeof k)
+            var view = await this.model.views[k];
+            if (view.isLeader){
+                hasLeader = view.isLeader
+                break
+            }
+        }
+        console.log("hasLeader or not?", hasLeader)
+        if (!hasLeader){
+            for (var k in this.model.views){
+                var view = await this.model.views[k]
+                console.log("Assign leader", view)
+                view.isLeader = true
+                hasLeader = true
+                break
+            }
+            console.log("Done Assign leader")
+        }
+
+        console.log('Is this Leader or not??', this.isLeader)
+        if (!this.isLeader){
+            for (var k in this.model.views){
+                var view = await this.model.views[k];
+                console.log('view', view)
+                if (view.isLeader){
+                    console.log("Calling setState")
+                    await this.plugin.state.setSnapshot(
+                        await view.plugin.state.getSnapshot()
+                    )
+                    break
+                }
+            }
+        }
     },
-    finalizeDisplay(){
+
+    async finalizeDisplay(){
       this.send({
           'type': 'request_loaded',
           'data': true
@@ -170,18 +215,16 @@ var MolstarView = widgets.DOMWidgetView.extend({
         PluginCommands.State.Snapshots.DownloadToFile(this.plugin, { type: 'json' })
     },
 
-    async saveState(){
+    async getState(){
+        // FIXME: wrong?
         var type = 'molj'
         const data = await this.plugin.managers.snapshot.serialize({ type })
-        console.log(data)
-        this.model.molstarStateJson = JSON.stringify(data)
+        return data
     },
 
-    async setState(){
-        if (this.model.molstarState) {
-            console.log("HELLO")
-            await this.plugin.managers.snapshot.setStateSnapshot(this.model.molstarStateJson)
-        }
+    async setState(data){
+        // FIXME: wrong?
+        await this.plugin.managers.snapshot.setStateSnapshot(data)
     },
 });
 

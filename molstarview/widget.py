@@ -1,9 +1,13 @@
+# Code is copied/adapted from nglview
 import threading
 import base64
 import ipywidgets as widgets
-from traitlets import Unicode
+from traitlets import (Bool, CaselessStrEnum, Dict, Instance, Int, Integer,
+                       List, Unicode, observe, validate)
 
+from .remote_thread import RemoteCallThread
 # See js/lib/widget.js for the frontend counterpart to this file.
+
 
 @widgets.register
 class MolstarView(widgets.DOMWidget):
@@ -23,7 +27,80 @@ class MolstarView(widgets.DOMWidget):
     _view_module_version = Unicode('^0.1.0').tag(sync=True)
     # Version of the front-end module containing widget model
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
-    value = Unicode('Hello World!').tag(sync=True)
+    frame = Integer().tag(sync=True)
+    loaded = Bool(False).tag(sync=False)
+
+    def __init__(self):
+        super().__init__()
+        self._molstar_component_ids = []
+        self._trajlist = []
+        self._callbacks_before_loaded = []
+        self._event = threading.Event()
+        self._remote_call_thread = RemoteCallThread(
+            self,
+            registered_funcs=[])
+        self._remote_call_thread.daemon = True
+        self._remote_call_thread.start()
+        self._handle_msg_thread = threading.Thread(
+            target=self.on_msg, args=(self._molstar_handle_message, ))
+        # register to get data from JS side
+        self._handle_msg_thread.daemon = True
+        self._handle_msg_thread.start()
+        self._state = None
+
+    def render_image(self):
+        image = widgets.Image()
+        self._js(f"this.exportImage('{image.model_id}')")
+        # image.value will be updated in _molstar_handle_message
+        return image
+
+    def handle_resize(self):
+        self._js("this.plugin.handleResize()")
+
+    @observe('loaded')
+    def on_loaded(self, change):
+        if change['new']:
+            self._fire_callbacks(self._callbacks_before_loaded)
+
+    def _run_on_another_thread(self, func, *args):
+        thread = threading.Thread(
+            target=func,
+            args=args,
+        )
+        thread.daemon = True
+        thread.start()
+        return thread
+
+    def _fire_callbacks(self, callbacks):
+        def _call(event):
+            for callback in callbacks:
+                callback(self)
+        self._run_on_another_thread(_call, self._event)
+
+    def _wait_until_finished(self, timeout=0.0001):
+        # FIXME: dummy for now
+        pass
+
+    def _load_structure_data(self, data: str, format: str = 'pdb'):
+        self._remote_call("loadStructureFromData",
+                          target="Widget",
+                          args=[data, format])
+
+    def _molstar_handle_message(self, widget, msg, buffers):
+        msg_type = msg.get("type")
+        data = msg.get("data")
+        if msg_type == "exportImage":
+            image = widgets.Widget.widgets[msg.get("model_id")]
+            image.value = base64.b64decode(data)
+        elif msg_type == "state":
+            self._state = data
+        elif msg_type == 'request_loaded':
+            if not self.loaded:
+                # FIXME: doublecheck this
+                # trick to trigger observe loaded
+                # so two viewers can have the same representations
+                self.loaded = False
+            self.loaded = msg.get('data')
 
     def __init__(self):
         super().__init__()
@@ -66,7 +143,18 @@ class MolstarView(widgets.DOMWidget):
                                         args=args,
                                         kwargs=kwargs,
                                         **other_kwargs)
-        self.send(msg)
+        def callback(widget, msg=msg):
+            widget.send(msg)
+
+        callback._method_name = method_name
+        callback._msg = msg
+
+        if self.loaded:
+            self._remote_call_thread.q.append(callback)
+        else:
+            # send later
+            # all callbacks will be called right after widget is loaded
+            self._callbacks_before_loaded.append(callback)
 
     def _get_remote_call_msg(self,
                              method_name,
@@ -82,3 +170,49 @@ class MolstarView(widgets.DOMWidget):
         msg['args'] = args
         msg['kwargs'] = kwargs
         return msg
+
+    def add_trajectory(self, trajectory):
+        self._load_structure_data(trajectory.get_structure_string(),
+                                  'pdb')  # FIXME
+        self._trajlist.append(trajectory)
+        self._update_max_frame()
+        self._molstar_component_ids.append(trajectory.id)
+
+    def _update_max_frame(self):
+        self.max_frame = max(
+            int(traj.n_frames) for traj in self._trajlist
+            if hasattr(traj, 'n_frames')) - 1 # index starts from 0
+
+    def _set_coordinates(self, index):
+        '''update coordinates for all trajectories at index-th frame
+        '''
+        if self._trajlist:
+            coordinates_dict = {}
+            for trajectory in self._trajlist:
+                traj_index = self._molstar_component_ids.index(trajectory.id)
+                try:
+                    coordinates_dict[traj_index] = trajectory.get_coordinates(
+                        index)
+                except (IndexError, ValueError):
+                    coordinates_dict[traj_index] = np.empty((0), dtype='f4')
+            self._send_coordinates(coordinates_dict)
+
+    def _send_coordinates(self, arr_dict):
+        self._coordinates_dict = arr_dict
+
+        buffers = []
+        coords_indices = dict()
+        for index, arr in self._coordinates_dict.items():
+            buffers.append(arr.astype('f4').tobytes())
+            coords_indices[index] = index
+        msg = {
+            'type': 'binary_single',
+            'data': coords_indices,
+        }
+        self.send(msg, buffers=buffers)
+
+    @observe('frame')
+    def _on_frame_changed(self, change):
+        """set and send coordinates at current frame
+        """
+        self._set_coordinates(self.frame)

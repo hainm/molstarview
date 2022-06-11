@@ -1,12 +1,14 @@
 var widgets = require('@jupyter-widgets/base');
 var _ = require('lodash');
-// var molConfig = require('molstar/lib/mol-plugin/config');
-// var molPluginUi =  require('molstar/lib/mol-plugin-ui');
 import {PluginConfig} from 'molstar/lib/mol-plugin/config'
 import {createPluginUI} from 'molstar/lib/mol-plugin-ui'
 import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure'
 import { BuiltInTrajectoryFormat } from 'molstar/lib/mol-plugin-state/formats/trajectory'
-require('molstar/lib/mol-plugin-ui/skin/light.scss'); // FIXME: loader issue for labextension building.
+import { PluginCommands } from 'molstar/lib/mol-plugin/commands'
+import { PluginState } from 'molstar/lib/mol-plugin/state'
+require('molstar/lib/mol-plugin-ui/skin/light.scss') // FIXME: loader issue for labextension building.
+
+// import { basicSpec } from "./ui"
 
 // See example.py for the kernel counterpart to this file.
 
@@ -44,8 +46,9 @@ var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
     async render() {
         this.handleMessage()
-        this.displayed.then(function(){
-            this.init()
+        this.displayed.then(async function(){
+            await this.init()
+            this.finalizeDisplay()
         }.bind(this))
     },
     async init(){
@@ -55,15 +58,16 @@ var MolstarView = widgets.DOMWidgetView.extend({
         this.el.appendChild(container);
         this.molContainer = container;
         this.plugin = await createPluginUI(container);
-        // call it after the plugin has been initialized
-        this.value_changed();
-        this.model.on('change:value', this.value_changed, this);
     },
-    value_changed() {
-        this.loadPdb(this.model.get('value'));
+    finalizeDisplay(){
+      this.send({
+          'type': 'request_loaded',
+          'data': true
+      })
     },
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
     async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, options?: { dataLabel?: string }) {
+        console.log("Calling loadStructureFromData")
         const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
         const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
         await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, 'default');
@@ -156,15 +160,33 @@ var MolstarView = widgets.DOMWidgetView.extend({
 
     exportImage(modelId){
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data){
-            data = data.replace("data:image/png;base64,", "");
+            data = data.replace("data:image/png;base64,", "")
             var msg = {"type": "exportImage", "data": data, "model_id": modelId}
             this.send(msg)
         }.bind(this))
-    }
+    },
+
+    downloadState(){
+        PluginCommands.State.Snapshots.DownloadToFile(this.plugin, { type: 'json' })
+    },
+
+    async saveState(){
+        var type = 'molj'
+        const data = await this.plugin.managers.snapshot.serialize({ type })
+        console.log(data)
+        this.model.molstarStateJson = JSON.stringify(data)
+    },
+
+    async setState(){
+        if (this.model.molstarState) {
+            console.log("HELLO")
+            await this.plugin.managers.snapshot.setStateSnapshot(this.model.molstarStateJson)
+        }
+    },
 });
 
 
 module.exports = {
     MolstarModel: MolstarModel,
-    MolstarView: MolstarView
+    MolstarView: MolstarView,
 };

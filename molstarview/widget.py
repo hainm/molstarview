@@ -5,6 +5,7 @@ import ipywidgets as widgets
 from traitlets import (Bool, CaselessStrEnum, Dict, Instance, Int, Integer,
                        List, Unicode, observe, validate)
 
+from .remote_thread import RemoteCallThread
 # See js/lib/widget.js for the frontend counterpart to this file.
 
 
@@ -26,24 +27,59 @@ class MolstarView(widgets.DOMWidget):
     _view_module_version = Unicode('^0.1.0').tag(sync=True)
     # Version of the front-end module containing widget model
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
-    value = Unicode('<Dummy>!').tag(sync=True)
     frame = Integer().tag(sync=True)
+    loaded = Bool(False).tag(sync=False)
 
     def __init__(self):
         super().__init__()
         self._molstar_component_ids = []
         self._trajlist = []
+        self._callbacks_before_loaded = []
+        self._event = threading.Event()
+        self._remote_call_thread = RemoteCallThread(
+            self,
+            registered_funcs=[])
+        self._remote_call_thread.daemon = True
+        self._remote_call_thread.start()
         self._handle_msg_thread = threading.Thread(
             target=self.on_msg, args=(self._molstar_handle_message, ))
         # register to get data from JS side
         self._handle_msg_thread.daemon = True
         self._handle_msg_thread.start()
+        self._state = None
 
     def render_image(self):
         image = widgets.Image()
         self._js(f"this.exportImage('{image.model_id}')")
         # image.value will be updated in _molstar_handle_message
         return image
+
+    def handle_resize(self):
+        self._js("this.plugin.handleResize()")
+
+    @observe('loaded')
+    def on_loaded(self, change):
+        if change['new']:
+            self._fire_callbacks(self._callbacks_before_loaded)
+
+    def _run_on_another_thread(self, func, *args):
+        thread = threading.Thread(
+            target=func,
+            args=args,
+        )
+        thread.daemon = True
+        thread.start()
+        return thread
+
+    def _fire_callbacks(self, callbacks):
+        def _call(event):
+            for callback in callbacks:
+                callback(self)
+        self._run_on_another_thread(_call, self._event)
+
+    def _wait_until_finished(self, timeout=0.0001):
+        # FIXME: dummy for now
+        pass
 
     def _load_structure_data(self, data: str, format: str = 'pdb'):
         self._remote_call("loadStructureFromData",
@@ -56,6 +92,15 @@ class MolstarView(widgets.DOMWidget):
         if msg_type == "exportImage":
             image = widgets.Widget.widgets[msg.get("model_id")]
             image.value = base64.b64decode(data)
+        elif msg_type == "state":
+            self._state = data
+        elif msg_type == 'request_loaded':
+            if not self.loaded:
+                # FIXME: doublecheck this
+                # trick to trigger observe loaded
+                # so two viewers can have the same representations
+                self.loaded = False
+            self.loaded = msg.get('data')
 
     def _js(self, code, **kwargs):
         # nglview code
@@ -77,7 +122,18 @@ class MolstarView(widgets.DOMWidget):
                                         args=args,
                                         kwargs=kwargs,
                                         **other_kwargs)
-        self.send(msg)
+        def callback(widget, msg=msg):
+            widget.send(msg)
+
+        callback._method_name = method_name
+        callback._msg = msg
+
+        if self.loaded:
+            self._remote_call_thread.q.append(callback)
+        else:
+            # send later
+            # all callbacks will be called right after widget is loaded
+            self._callbacks_before_loaded.append(callback)
 
     def _get_remote_call_msg(self,
                              method_name,
@@ -132,7 +188,6 @@ class MolstarView(widgets.DOMWidget):
             'type': 'binary_single',
             'data': coords_indices,
         }
-        print(msg, buffers)
         self.send(msg, buffers=buffers)
 
     @observe('frame')

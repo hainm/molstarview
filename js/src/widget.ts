@@ -32,11 +32,10 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
     defaults: _.extend(widgets.DOMWidgetModel.prototype.defaults(), {
         _model_name : 'MolstarModel',
         _view_name : 'MolstarView',
-        _model_module : 'jupyter-widget-example',
-        _view_module : 'jupyter-widget-example',
+        _model_module : 'molstarview-widget',
+        _view_module : 'molstarview-widget',
         _model_module_version : '0.1.0',
         _view_module_version : '0.1.0',
-        value : 'Molstar World!'
     })
 });
 
@@ -181,7 +180,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     handleEmbed(){
-        var snaphShot = JSON.parse(this.model.get("molstate"))
+        var snaphShot = this.model.get("molstate")
         this.setState(snaphShot)
     },
 

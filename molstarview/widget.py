@@ -29,6 +29,7 @@ class MolstarView(widgets.DOMWidget):
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
     frame = Integer().tag(sync=True)
     loaded = Bool(False).tag(sync=False)
+    molstate = Dict().tag(sync=True)
 
     def __init__(self):
         super().__init__()
@@ -102,26 +103,11 @@ class MolstarView(widgets.DOMWidget):
                 self.loaded = False
             self.loaded = msg.get('data')
 
-    def __init__(self):
-        super().__init__()
-        self._handle_msg_thread = threading.Thread(
-            target=self.on_msg, args=(self._molview_handle_message,))
-        # register to get data from JS side
-        self._handle_msg_thread.daemon = True
-        self._handle_msg_thread.start()
-
     def render_image(self):
         image = widgets.Image()
         self._js(f"this.exportImage('{image.model_id}')")
         # image.value will be updated in _molview_handle_message
         return image
-
-    def _molview_handle_message(self, widget, msg, buffers):
-        msg_type = msg.get("type")
-        data = msg.get("data")
-        if msg_type == "exportImage":
-            image = widgets.Widget.widgets[msg.get("model_id")]
-            image.value = base64.b64decode(data)
 
     def _js(self, code, **kwargs):
         # nglview code

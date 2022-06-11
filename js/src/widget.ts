@@ -32,11 +32,10 @@ var MolstarModel = widgets.DOMWidgetModel.extend({
     defaults: _.extend(widgets.DOMWidgetModel.prototype.defaults(), {
         _model_name : 'MolstarModel',
         _view_name : 'MolstarView',
-        _model_module : 'jupyter-widget-example',
-        _view_module : 'jupyter-widget-example',
+        _model_module : 'molstarview-widget',
+        _view_module : 'molstarview-widget',
         _model_module_version : '0.1.0',
         _view_module_version : '0.1.0',
-        value : 'Molstar World!'
     })
 });
 
@@ -48,6 +47,9 @@ var MolstarView = widgets.DOMWidgetView.extend({
         this.handleMessage()
         this.displayed.then(async function(){
             await this.initializeDisplay()
+            if (this.model.comm == undefined){
+                this.handleEmbed()
+            }
             await this.finalizeDisplay()
         }.bind(this))
     },
@@ -92,11 +94,11 @@ var MolstarView = widgets.DOMWidgetView.extend({
         if (!this.isLeader){
             for (var k in this.model.views){
                 var view = await this.model.views[k];
-                console.log('view', view)
                 if (view.isLeader){
                     console.log("Calling setState")
+                    var data = await view.plugin.state.getSnapshot()
                     await this.plugin.state.setSnapshot(
-                        await view.plugin.state.getSnapshot()
+                        data
                     )
                     break
                 }
@@ -156,7 +158,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
                         func.apply(this, new_args);
                     } else {
                         // send error message to Python?
-                        console.log('can not create func for ' + msg.methodName);
+                        console.log('Can not create func for ' + msg.methodName);
                     }
                     break;
             }
@@ -176,6 +178,12 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
 
     },
+
+    handleEmbed(){
+        var snaphShot = this.model.get("molstate")
+        this.setState(snaphShot)
+    },
+
     handleMessage(){
         this.model.on("msg:custom", function(msg){
            this.on_msg(msg);
@@ -216,15 +224,19 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     async getState(){
-        // FIXME: wrong?
-        var type = 'molj'
-        const data = await this.plugin.managers.snapshot.serialize({ type })
-        return data
+        if (this.isLeader){
+            console.log("getState from master view")
+            var data = this.plugin.state.getSnapshot()
+            console.log(typeof data, data)
+            this.model.set("molstate", data)
+            this.touch()
+        }
     },
 
     async setState(data){
-        // FIXME: wrong?
-        await this.plugin.managers.snapshot.setStateSnapshot(data)
+        console.log('setState called')
+        console.log(data)
+        await this.plugin.state.setSnapshot(data)
     },
 });
 

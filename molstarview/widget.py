@@ -164,6 +164,11 @@ class MolstarView(widgets.DOMWidget):
         self._update_max_frame()
         self._molstar_component_ids.append(trajectory.id)
 
+    def add_structure(self, struc):
+        self._load_structure_data(struc.get_structure_string(),
+                                  'pdb')
+        self._molstar_component_ids.append(struc.id)
+
     def _update_max_frame(self):
         self.max_frame = max(
             int(traj.n_frames) for traj in self._trajlist

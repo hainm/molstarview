@@ -8,6 +8,25 @@ molstarview-widget
 - Similar package(s) that was bornt before `molstarview`:
     - https://github.com/janash/pymolstar
 
+Example
+-------
+
+- Load structure and trajectory
+- 
+```python
+from molstarview.widget import MolstarView
+from nglview.adaptor import SimpletrajTrajectory
+import nglview as nv
+
+traj = SimpletrajTrajectory(nv.datafiles.XTC, nv.datafiles.PDB)
+view = MolstarView()
+view.add_trajectory(traj)
+
+struc = nv.FileStructure('1tsu.pdb')
+view.add_structure(struc)
+view
+```
+
 Installation
 ------------
 

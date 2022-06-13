@@ -6,7 +6,10 @@ import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure'
 import { BuiltInTrajectoryFormat } from 'molstar/lib/mol-plugin-state/formats/trajectory'
 import { PluginCommands } from 'molstar/lib/mol-plugin/commands'
 import { PluginState } from 'molstar/lib/mol-plugin/state'
+import { StateTransforms } from 'molstar/lib/mol-plugin-state/transforms'
+import { Vec3, Quat, Mat4 } from 'molstar/lib/mol-math/linear-algebra'
 require('molstar/lib/mol-plugin-ui/skin/light.scss') // FIXME: loader issue for labextension building.
+import * as representation from "./representation"
 
 // import { basicSpec } from "./ui"
 
@@ -238,6 +241,16 @@ var MolstarView = widgets.DOMWidgetView.extend({
         console.log(data)
         await this.plugin.state.setSnapshot(data)
     },
+
+    addRepresentation(params, modelIndex){
+        representation.addRepresentation(this.plugin, params, modelIndex)
+    },
+
+    removeRepresentation(modelIndex){
+        var st = this.plugin.managers.structure.hierarchy.current.structures[modelIndex]
+        this.plugin.managers.structure.component.removeRepresentations(st.components)
+    },
+
 });
 
 

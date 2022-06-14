@@ -63,7 +63,7 @@ class MolstarView(widgets.DOMWidget):
         if change['new']:
             self._fire_callbacks(self._callbacks_before_loaded)
 
-    def _run_on_another_thread(self, func, *args):
+    def _thread_run(self, func, *args):
         thread = threading.Thread(
             target=func,
             args=args,
@@ -76,7 +76,7 @@ class MolstarView(widgets.DOMWidget):
         def _call(event):
             for callback in callbacks:
                 callback(self)
-        self._run_on_another_thread(_call, self._event)
+        self._thread_run(_call, self._event)
 
     def _wait_until_finished(self, timeout=0.0001):
         # FIXME: dummy for now

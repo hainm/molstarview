@@ -116,11 +116,13 @@ var MolstarView = widgets.DOMWidgetView.extend({
       })
     },
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
-    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, options?: { dataLabel?: string }) {
+    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, preset?, options?: { dataLabel?: string }) {
         console.log("Calling loadStructureFromData")
         const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
         const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
-        await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, 'default');
+        if (preset){
+            await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, preset)
+        }
     },
 
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223

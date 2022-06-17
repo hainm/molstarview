@@ -117,11 +117,16 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
     async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, preset?, options?: { dataLabel?: string }) {
-        console.log("Calling loadStructureFromData")
         const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
         const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
         if (preset){
+            console.log("Calling loadStructureFromData with preset", preset)
             await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, preset)
+        } else {
+            console.log('Calling loadStructureFromData without preset')
+            const model = await this.plugin.builders.structure.createModel(trajectory)
+            const structure = await this.plugin.builders.structure.createStructure(model)
+            const all = await this.plugin.builders.structure.tryCreateComponentStatic(structure, 'all')
         }
     },
 
@@ -229,6 +234,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     async getState(){
+        // FIXME: rename function?
         if (this.isLeader){
             console.log("getState from master view")
             var data = this.plugin.state.getSnapshot()
@@ -244,6 +250,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         await this.plugin.state.setSnapshot(data)
     },
 
+    // representation
     addRepresentation(params, modelIndex){
         representation.addRepresentation(this.plugin, params, modelIndex)
     },
@@ -253,6 +260,20 @@ var MolstarView = widgets.DOMWidgetView.extend({
         this.plugin.managers.structure.component.removeRepresentations(st.components)
     },
 
+    // camera
+    resetCamera(){
+        PluginCommands.Camera.Reset(this.plugin, {})
+    },
+
+    setCamera(params){
+        var durationMs = 0.0
+        this.plugin.canvas3d.requestCameraReset({durationMs, params})
+    },
+
+    getCamera(){
+        var snapshot = this.plugin.canvas3d.camera.getSnapshot()
+        this.send({"type": "getCamera", "data": snapshot})
+    }
 });
 
 

@@ -82,10 +82,10 @@ class MolstarView(widgets.DOMWidget):
         # FIXME: dummy for now
         pass
 
-    def _load_structure_data(self, data: str, format: str = 'pdb'):
+    def _load_structure_data(self, data: str, format: str = 'pdb', preset="default"):
         self._remote_call("loadStructureFromData",
                           target="Widget",
-                          args=[data, format])
+                          args=[data, format, preset])
 
     def _molstar_handle_message(self, widget, msg, buffers):
         msg_type = msg.get("type")
@@ -102,6 +102,8 @@ class MolstarView(widgets.DOMWidget):
                 # so two viewers can have the same representations
                 self.loaded = False
             self.loaded = msg.get('data')
+        elif msg_type == 'getCamera':
+            self._molcamera = data
 
     def render_image(self):
         image = widgets.Image()

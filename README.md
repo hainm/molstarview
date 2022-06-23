@@ -52,3 +52,7 @@ Then you need to rebuild the JS when you make a code change:
     $ yarn run build
 
 You then need to refresh the JupyterLab page when your javascript changes.
+
+# Acknowledgement
+- Thanks [nglview](https://github.com/nglviewer/nglview) for its code.
+- Thanks [David Sehnal](https://github.com/dsehnal) for answering all questions about `molstar`.

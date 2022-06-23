@@ -57,12 +57,13 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }.bind(this))
     },
     async initializeDisplay(){
-        const container = document.createElement('div');
-        container.style.width = '800px';
-        container.style.height = '600px';
-        this.el.appendChild(container);
-        this.molContainer = container;
-        this.plugin = await createPluginUI(container);
+        const container = document.createElement('div')
+        container.style.width = '800px'
+        container.style.height = '600px'
+        this.el.appendChild(container)
+        this.container = container
+        this.plugin = await createPluginUI(container)
+        this._focused = false
 
         // FIXME: make a new function called "restoreStateIfNeeded"?
         // Find "leader" view
@@ -107,6 +108,21 @@ var MolstarView = widgets.DOMWidgetView.extend({
                 }
             }
         }
+    },
+
+    handleSignals(){
+        var that = this
+        this.container.addEventListener('mouseover', function(e) {
+            that._focused = 1;
+            e; // linter
+            that.mouseOverDisplay('block')
+        }, false);
+
+        this.container.addEventListener('mouseout', function(e) {
+            that._focused = 0;
+            e; // linter
+            that.mouseOverDisplay('none')
+        }, false);
     },
 
     async finalizeDisplay(){
@@ -273,7 +289,24 @@ var MolstarView = widgets.DOMWidgetView.extend({
     getCamera(){
         var snapshot = this.plugin.canvas3d.camera.getSnapshot()
         this.send({"type": "getCamera", "data": snapshot})
-    }
+    },
+
+    syncCamera(){
+        // From NGLVIEW
+        var that = this
+        if (that._synced_model_ids.length > 0 && that._focused){
+            that._synced_model_ids.forEach(async function(mid){
+                var model = await that.model.widget_manager.get_model(mid)
+                for (var k in model.views){
+                    var pview = model.views[k];
+                    var view = await model.views[k]
+                    if !(view == that){
+                        view.setCamera(that.plugin.canvas3d.camera.getSnapshot())
+                    }
+                }
+            })
+        }
+    },
 });
 
 

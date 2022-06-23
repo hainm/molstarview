@@ -63,7 +63,7 @@ class MolstarView(widgets.DOMWidget):
         if change['new']:
             self._fire_callbacks(self._callbacks_before_loaded)
 
-    def _run_on_another_thread(self, func, *args):
+    def _thread_run(self, func, *args):
         thread = threading.Thread(
             target=func,
             args=args,
@@ -76,16 +76,16 @@ class MolstarView(widgets.DOMWidget):
         def _call(event):
             for callback in callbacks:
                 callback(self)
-        self._run_on_another_thread(_call, self._event)
+        self._thread_run(_call, self._event)
 
     def _wait_until_finished(self, timeout=0.0001):
         # FIXME: dummy for now
         pass
 
-    def _load_structure_data(self, data: str, format: str = 'pdb'):
+    def _load_structure_data(self, data: str, format: str = 'pdb', preset="default"):
         self._remote_call("loadStructureFromData",
                           target="Widget",
-                          args=[data, format])
+                          args=[data, format, preset])
 
     def _molstar_handle_message(self, widget, msg, buffers):
         msg_type = msg.get("type")
@@ -102,6 +102,8 @@ class MolstarView(widgets.DOMWidget):
                 # so two viewers can have the same representations
                 self.loaded = False
             self.loaded = msg.get('data')
+        elif msg_type == 'getCamera':
+            self._molcamera = data
 
     def render_image(self):
         image = widgets.Image()
@@ -163,6 +165,11 @@ class MolstarView(widgets.DOMWidget):
         self._trajlist.append(trajectory)
         self._update_max_frame()
         self._molstar_component_ids.append(trajectory.id)
+
+    def add_structure(self, struc):
+        self._load_structure_data(struc.get_structure_string(),
+                                  'pdb')
+        self._molstar_component_ids.append(struc.id)
 
     def _update_max_frame(self):
         self.max_frame = max(

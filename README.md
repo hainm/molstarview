@@ -1,4 +1,4 @@
-# NOTHING TO SEE YET. PLEASE COME BACK LATER
+# Usable but still "Work-in-progress"
 # Codes are copied/adapted from nglview and molstar. Will update the licenses.
 
 molstarview-widget

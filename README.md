@@ -30,11 +30,8 @@ view
 Installation
 ------------
 
-To install use pip:
 
-    $ pip install molstarview
-
-For a development installation (requires [Node.js](https://nodejs.org) and [Yarn version 1](https://classic.yarnpkg.com/)),
+Only development installation is available (requires [Node.js](https://nodejs.org) and [Yarn version 1](https://classic.yarnpkg.com/)),
 
     $ git clone https://github.com/molstar/molstarview-widget.git
     $ cd molstarview-widget

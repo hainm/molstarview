@@ -300,7 +300,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
                 for (var k in model.views){
                     var pview = model.views[k];
                     var view = await model.views[k]
-                    if !(view == that){
+                    if (view != that){
                         view.setCamera(that.plugin.canvas3d.camera.getSnapshot())
                     }
                 }

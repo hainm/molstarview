@@ -20,7 +20,8 @@
     "dist/*.js"
   ],
   "scripts": {
-    "prepublish": "yarn run clean && yarn run build:notebook && yarn run build:labextension",
+    "prepublish": "yarn run clean && yarn run build:notebook",
+    "build:prod": "yarn run build:notebook",
     "build:notebook": "tsc && webpack --mode=production",
     "build:labextension": "jupyter labextension build .",
     "clean": "rimraf dist/ && rimraf ../molstarview/nbextension"
@@ -32,6 +33,7 @@
     "jsx-runtime": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.69.7",
     "sass-loader": "^13.3.3",
     "css-loader": "^6.8.1",

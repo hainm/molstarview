@@ -1,11 +1,14 @@
 var path = require('path');
 var version = require('./package.json').version;
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-// Custom webpack rules are generally the same for all webpack bundles, hence
-// stored in a separate local variable.
 var rules = [
-    // { test: /\.css$/, use: ['style-loader', 'css-loader']},
-    { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader']}
+    {
+        test: /\.(s*)css$/,
+        use: [MiniCssExtractPlugin.loader,
+             {loader: 'css-loader': options: { sourceMap: false }},
+             {loader: 'sass-loader', options: { sourceMap: false}}]
+    }
 ]
 
 

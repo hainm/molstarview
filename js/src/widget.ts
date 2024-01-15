@@ -8,7 +8,7 @@ import { PluginCommands } from 'molstar/lib/mol-plugin/commands'
 import { PluginState } from 'molstar/lib/mol-plugin/state'
 import { StateTransforms } from 'molstar/lib/mol-plugin-state/transforms'
 import { Vec3, Quat, Mat4 } from 'molstar/lib/mol-math/linear-algebra'
-require('molstar/lib/mol-plugin-ui/skin/light.scss') // FIXME: loader issue for labextension building.
+// require('molstar/lib/mol-plugin-ui/skin/light.scss') // FIXME: loader issue for labextension building.
 import * as representation from "./representation"
 
 // import { basicSpec } from "./ui"

@@ -1,8 +1,8 @@
-from __future__ import print_function
 from setuptools import setup, find_packages
 import os
 from os.path import join as pjoin
 from distutils import log
+from setuptools import Command
 
 from jupyter_packaging import (
     create_cmdclass,
@@ -35,10 +35,21 @@ data_files_spec = [
     ('etc/jupyter/nbconfig/notebook.d', '.', 'molstarview-widget.json'),
 ]
 
+class NPM(Command):
+    def initialize_options(self):
+        pass
+    
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        pass
+
 cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
-cmdclass['jsdeps'] = combine_commands(
-    install_npm(js_dir, npm=['yarn'], build_cmd='build:prod'), ensure_targets(jstargets),
-)
+cmdclass['jsdeps'] = NPM
+# cmdclass['jsdeps'] = combine_commands(
+#     install_npm(js_dir, npm=['yarn'], build_cmd='build:prod'), ensure_targets(jstargets),
+# )
 
 setup_args = dict(
     name=name,
@@ -54,15 +65,14 @@ setup_args = dict(
     cmdclass=cmdclass,
     author='Hai Nguyen',
     author_email='hainm.comp@gmail.com',
-    url='https://github.com/molstar/molstarview-widget',
+    url='https://github.com/hainm/molstarview',
     keywords=[
-        'ipython',
         'jupyter',
         'widgets',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Framework :: IPython',
+        'Framework :: Jupyter',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Topic :: Multimedia :: Graphics',

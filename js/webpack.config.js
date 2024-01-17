@@ -5,8 +5,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var rules = [
     {
         test: /\.(s*)css$/,
-        use: [MiniCssExtractPlugin.loader,
-             {loader: 'css-loader': options: { sourceMap: false }},
+        use: [
+             {loader: 'style-loader', options: { sourceMap: false }},
+             {loader: 'css-loader', options: { sourceMap: false }},
              {loader: 'sass-loader', options: { sourceMap: false}}]
     }
 ]
@@ -28,7 +29,6 @@ module.exports = (env, argv) => {
                 filename: 'extension.js',
                 path: path.resolve(__dirname, '..', 'molstarview', 'nbextension'),
                 libraryTarget: 'amd',
-                publicPath: '' // publicPath is set in extension.js
             },
             devtool
         },
@@ -43,9 +43,8 @@ module.exports = (env, argv) => {
                 filename: 'index.js',
                 path: path.resolve(__dirname, '..', 'molstarview', 'nbextension'),
                 libraryTarget: 'amd',
-                publicPath: '',
             },
-            devtool,
+            devtool: 'source-map',
             module: {
                 rules: rules
             },
@@ -72,7 +71,7 @@ module.exports = (env, argv) => {
                 libraryTarget: 'amd',
                 publicPath: 'https://unpkg.com/molstarview-widget@' + version + '/dist/'
             },
-            devtool,
+            devtool: 'source-map',
             module: {
                 rules: rules
             },

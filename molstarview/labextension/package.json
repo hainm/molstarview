@@ -21,17 +21,19 @@
   ],
   "scripts": {
     "prepublish": "yarn run clean && yarn run build:notebook && yarn run build:labextension",
+    "build:prod": "yarn run build:notebook",
     "build:notebook": "tsc && webpack --mode=production",
     "build:labextension": "jupyter labextension build .",
     "clean": "rimraf dist/ && rimraf ../molstarview/nbextension"
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^3.0.5",
+    "@jupyterlab/builder": "^4",
     "webpack": "^5",
     "rimraf": "^2.6.1",
     "jsx-runtime": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.69.7",
     "sass-loader": "^13.3.3",
     "css-loader": "^6.8.1",
@@ -47,7 +49,7 @@
     "@typescript-eslint/parser": "^4.8.1"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
+    "@jupyter-widgets/base": "^6",
     "lodash": "^4.17.4",
     "molstar": "^3.44"
   },
@@ -61,7 +63,7 @@
       }
     },
     "_build": {
-      "load": "static",
+      "load": "static/remoteEntry.89874ad58c883a6f0d6a.js",
       "extension": "./extension"
     }
   }

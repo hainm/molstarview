@@ -1,6 +1,6 @@
 {
   "name": "molstarview-widget",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "molstarview",
   "author": "Hai Nguyen",
   "main": "lib/index.js",
@@ -20,26 +20,38 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../molstarview/labextension/ && rimraf ../molstarview/nbextension",
-    "prepublish": "yarn run clean && yarn run build:prod",
-    "build": "webpack --mode=development && yarn run build:labextension:dev",
-    "build:prod": "webpack --mode=production && yarn run build:labextension",
+    "prepublish": "yarn run clean && yarn run build:notebook && yarn run build:labextension",
+    "build:prod": "yarn run build:notebook",
+    "build:notebook": "tsc && webpack --mode=production",
     "build:labextension": "jupyter labextension build .",
-    "build:labextension:dev": "jupyter labextension build --development True .",
-    "watch": "webpack --watch --mode=development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf dist/ && rimraf ../molstarview/nbextension"
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^3.0.0",
+    "@jupyterlab/builder": "^4",
     "webpack": "^5",
     "rimraf": "^2.6.1",
-    "sass-loader": "^11.1.1",
-    "node-sass": "^7.0.0"
+    "jsx-runtime": "^1.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "sass": "^1.69.7",
+    "sass-loader": "^13.3.3",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "node-sass": "^9.0.0",
+    "typescript": "~4.1.3",
+    "@types/chai": "^4.1.4",
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^2.2.48",
+    "@types/node": "^12.0.2",
+    "@types/requirejs": "^2.1.31",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
+    "@jupyter-widgets/base": "^6",
     "lodash": "^4.17.4",
-    "molstar": "^3.9"
+    "molstar": "^3.44"
   },
   "jupyterlab": {
     "extension": "lib/labplugin",
@@ -51,7 +63,7 @@
       }
     },
     "_build": {
-      "load": "static/remoteEntry.798a8a1761985a5717e3.js",
+      "load": "static/remoteEntry.89874ad58c883a6f0d6a.js",
       "extension": "./extension"
     }
   }

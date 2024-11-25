@@ -1,5 +1,5 @@
-var widgets = require('@jupyter-widgets/base');
-var _ = require('lodash');
+import * as widgets from '@jupyter-widgets/base';
+import * as _ from 'underscore';
 import { PluginConfig } from 'molstar/lib/mol-plugin/config';
 import { createPluginUI } from 'molstar/lib/mol-plugin-ui';
 import * as molStructure from 'molstar/lib/mol-plugin-state/actions/structure';

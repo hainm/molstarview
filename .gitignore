@@ -151,5 +151,3 @@ molstarview/nbextension/index.*
 # -------------
 **/coverage/
 
-# Packed lab extensions
-molstarview/labextension

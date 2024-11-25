@@ -126,17 +126,21 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
-    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, preset?: any, options?: { dataLabel?: string }) {
+    async loadStructureFromData(
+        data: string | number[],
+        format: BuiltInTrajectoryFormat,
+        preset?: any,
+        options?: { dataLabel?: string }
+    ) {
         const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
         const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
+
         if (preset) {
-            console.log("Calling loadStructureFromData with preset", preset)
-            await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, preset)
+            console.log("Calling loadStructureFromData with preset", preset);
+            await this.plugin.builders.structure.hierarchy.applyPreset(trajectory, preset);
         } else {
-            console.log('Calling loadStructureFromData without preset')
-            const model = await this.plugin.builders.structure.createModel(trajectory)
-            const structure = await this.plugin.builders.structure.createStructure(model)
-            const all = await this.plugin.builders.structure.tryCreateComponentStatic(structure, 'all')
+            console.log('Calling loadStructureFromData without preset');
+            await this.plugin.builders.structure.createModel(trajectory);
         }
     },
 
@@ -225,7 +229,6 @@ var MolstarView = widgets.DOMWidgetView.extend({
     updateCoordinates(coordinates: any, modelIndex: any) {
         var component = 0; // FIXME
         if (coordinates && typeof component != 'undefined') {
-            const coords = new Float32Array(coordinates);
             // FIXME: update
         }
     },

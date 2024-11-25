@@ -1,6 +1,5 @@
-
 export
-function addRepresentation(plugin, params, modelIndex){
+function addRepresentation(plugin: any, params: any, modelIndex: number){
     var st = plugin.managers.structure.hierarchy.current.structures[modelIndex]
     console.log("Calling from addRepresentation", st, params, modelIndex)
     var components = st.components
@@ -16,6 +15,6 @@ export
 function removeRepresentation(){
 }
 
-export 
+export
 function clearRepresentation(){
 }

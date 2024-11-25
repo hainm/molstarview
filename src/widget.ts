@@ -45,13 +45,13 @@ var MolstarView = widgets.DOMWidgetView.extend({
     // Defines how the widget gets rendered into the DOM
     async render() {
         this.handleMessage();
-        this.displayed.then(async function() {
+        this.displayed.then(async () => {
             await this.initializeDisplay();
             if (this.model.comm == undefined) {
                 this.handleEmbed();
             }
             await this.finalizeDisplay();
-        }.bind(this));
+        });
     },
 
     async initializeDisplay() {
@@ -105,13 +105,13 @@ var MolstarView = widgets.DOMWidgetView.extend({
 
     handleSignals() {
         var that = this;
-        this.container.addEventListener('mouseover', function(e) {
+        this.container.addEventListener('mouseover', function(e: any) {
             that._focused = 1;
             e; // linter
             that.mouseOverDisplay('block');
         }, false);
 
-        this.container.addEventListener('mouseout', function(e) {
+        this.container.addEventListener('mouseout', function(e: any) {
             that._focused = 0;
             e; // linter
             that.mouseOverDisplay('none');
@@ -126,7 +126,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
-    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, preset?, options?: { dataLabel?: string }) {
+    async loadStructureFromData(data: string | number[], format: BuiltInTrajectoryFormat, preset?: any, options?: { dataLabel?: string }) {
         const _data = await this.plugin.builders.data.rawData({ data, label: options?.dataLabel });
         const trajectory = await this.plugin.builders.structure.parseTrajectory(_data, format);
         if (preset) {
@@ -142,7 +142,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
 
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
     // this method is taken from the Viewer class
-    loadPdb(pdb) {
+    loadPdb(pdb: any) {
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
         const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
         return this.plugin.runTask(this.plugin.state.data.applyAction(molStructure.DownloadStructure, {
@@ -162,11 +162,11 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }));
     },
 
-    executeCode(code) {
+    executeCode(code: any) {
         eval(code);
     },
 
-    on_msg(msg) {
+    on_msg(msg: any) {
         if (msg.type == 'call_method') {
             var new_args = msg.args.slice();
             new_args.push(msg.kwargs);
@@ -186,7 +186,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
     },
 
-    handleBinaryMessage(msg) {
+    handleBinaryMessage(msg: any) {
         var coordinateMeta = msg.data;
         var coordinates;
         var keys = Object.keys(coordinateMeta);
@@ -206,23 +206,23 @@ var MolstarView = widgets.DOMWidgetView.extend({
     },
 
     handleMessage() {
-        this.model.on("msg:custom", function(msg) {
+        this.model.on("msg:custom", (msg: any) => {
             this.on_msg(msg);
         }, this);
 
         if (this.model.comm) {
-            this.model.comm.on_msg(function(msg) {
+            this.model.comm.on_msg((msg: any) => {
                 var buffers = msg.buffers;
                 var content = msg.content.data.content;
                 if (buffers.length && content) {
                     content.buffers = buffers;
                 }
                 this.model._handle_comm_msg.call(this.model, msg);
-            }.bind(this));
+            });
         }
     },
 
-    updateCoordinates(coordinates, modelIndex) {
+    updateCoordinates(coordinates: any, modelIndex: any) {
         var component = 0; // FIXME
         if (coordinates && typeof component != 'undefined') {
             var coords = new Float32Array(coordinates);
@@ -230,7 +230,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
     },
 
-    exportImage(modelId) {
+    exportImage(modelId: any) {
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data) {
             data = data.replace("data:image/png;base64,", "");
             var msg = { "type": "exportImage", "data": data, "model_id": modelId };

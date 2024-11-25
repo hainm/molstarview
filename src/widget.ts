@@ -153,7 +153,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
                         id: pdb,
                         server: {
                             name: provider,
-                            params: molStructure.PdbDownloadProvider[provider].defaultValue
+                            params: molStructure.PdbDownloadProvider[provider as keyof typeof molStructure.PdbDownloadProvider].defaultValue
                         }
                     },
                     options: { ...params.source.params.options },
@@ -225,17 +225,17 @@ var MolstarView = widgets.DOMWidgetView.extend({
     updateCoordinates(coordinates: any, modelIndex: any) {
         var component = 0; // FIXME
         if (coordinates && typeof component != 'undefined') {
-            var coords = new Float32Array(coordinates);
+            const coords = new Float32Array(coordinates);
             // FIXME: update
         }
     },
 
     exportImage(modelId: any) {
-        this.plugin.helpers.viewportScreenshot.getImageDataUri().then(function(data) {
+        this.plugin.helpers.viewportScreenshot.getImageDataUri().then((data: string) => {
             data = data.replace("data:image/png;base64,", "");
             var msg = { "type": "exportImage", "data": data, "model_id": modelId };
             this.send(msg);
-        }.bind(this));
+        });
     },
 
     downloadState() {
@@ -250,15 +250,15 @@ var MolstarView = widgets.DOMWidgetView.extend({
         }
     },
 
-    async setState(data) {
+    async setState(data: any) {
         await this.plugin.state.setSnapshot(data);
     },
 
-    addRepresentation(params, modelIndex) {
+    addRepresentation(params: any, modelIndex: any) {
         representation.addRepresentation(this.plugin, params, modelIndex);
     },
 
-    removeRepresentation(modelIndex) {
+    removeRepresentation(modelIndex: any) {
         var st = this.plugin.managers.structure.hierarchy.current.structures[modelIndex];
         this.plugin.managers.structure.component.removeRepresentations(st.components);
     },
@@ -267,7 +267,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
         PluginCommands.Camera.Reset(this.plugin, {});
     },
 
-    setCamera(params) {
+    setCamera(params: any) {
         var durationMs = 0.0;
         this.plugin.canvas3d.requestCameraReset({ durationMs, params });
     },
@@ -280,7 +280,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
     syncCamera() {
         var that = this;
         if (that._synced_model_ids.length > 0 && that._focused) {
-            that._synced_model_ids.forEach(async function(mid) {
+            that._synced_model_ids.forEach(async function(mid: any) {
                 var model = await that.model.widget_manager.get_model(mid);
                 for (var k in model.views) {
                     var view = await model.views[k];

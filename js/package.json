@@ -1,5 +1,5 @@
 {
-  "name": "nglview-js-widgets",
+  "name": "molstarview-widget",
   "version": "3.1.5",
   "description": "nglview-js-widgets",
   "keywords": [
@@ -13,9 +13,9 @@
     "science",
     "widgets"
   ],
-  "homepage": "https://github.com/nglviewer/nglview/js",
+  "homepage": "https://github.com/nglviewer/molstarview/js",
   "bugs": {
-    "url": "https://github.com/nglviewer/nglview/issues"
+    "url": "https://github.com/nglviewer/molstarview/issues"
   },
   "license": "MIT",
   "author": {
@@ -31,7 +31,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nglviewer/nglview.git"
+    "url": "https://github.com/nglviewer/molstarview.git"
   },
   "scripts": {
     "prepublish": "yarn build:prod && webpack && yarn run copy:labextension",

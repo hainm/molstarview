@@ -7,7 +7,7 @@ if (window.require) {
     window.require.config({
         map: {
             "*" : {
-                "nglview-js-widgets": "nbextensions/nglview-js-widgets/index",
+                "molstarview-widget": "nbextensions/molstarview-widget/index"
             }
         }
     });

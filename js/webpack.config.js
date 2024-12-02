@@ -73,7 +73,7 @@ module.exports = [
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist'),
             libraryTarget: 'amd',
-            publicPath: 'https://unpkg.com/nglview-js-widgets@' + version + '/dist/'
+            publicPath: 'https://unpkg.com/molstarview-widget@' + version + '/dist/'
         },
         devtool: 'source-map',
         module: {

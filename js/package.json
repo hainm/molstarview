@@ -52,7 +52,7 @@
     "watch": "run-p watch:src watch:labextension",
     "watch:src": "tsc -w",
     "watch:labextension": "jupyter labextension watch .",
-    "watch:install": "nodemon --watch src/widget_ngl.ts --exec 'npm install'",
+    "watch:install": "nodemon --watch src/widget.ts --exec 'npm install'",
     "test": "mocha"
   },
   "dependencies": {
@@ -61,7 +61,7 @@
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "lodash": "^4.17.4",
-    "ngl": "2.4.0",
+    "molstar": "4.9.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
@@ -80,7 +80,6 @@
     "file-loader": "^6.2.0",
     "json-loader": "^0.5.7",
     "mkdirp": "^1.0.3",
-    "ngl": "2.4.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",

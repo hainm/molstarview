@@ -3,48 +3,58 @@ from setuptools import setup, find_packages
 import os
 from os.path import join as pjoin
 from distutils import log
-
+from pathlib import Path
 from jupyter_packaging import (
-    create_cmdclass,
-    install_npm,
-    ensure_targets,
-    combine_commands,
     get_version,
+    wrap_installers,
+    get_data_files,
 )
 
 
 here = os.path.dirname(os.path.abspath(__file__))
+node_root = os.path.join(here, 'js')
+is_repo = os.path.exists(os.path.join(here, '.git'))
 
-name = 'molstarview'
-LONG_DESCRIPTION = 'molstarview'
+log.set_verbosity(log.DEBUG)
+log.info('setup.py entered')
+log.info('$PATH=%s' % os.environ['PATH'])
 
-# Get molstarview version
-version = get_version(pjoin(name, '_version.py'))
+def update_package_data(distribution):
+    """update package_data to catch changes during setup"""
+    build_py = distribution.get_command_obj('build_py')
+    build_py.finalize_options()
 
-js_dir = pjoin(here, 'js')
-
-# Representative files that should exist after a successful build
-jstargets = [
-    pjoin(js_dir, 'dist', 'index.js'),
-]
+HERE = Path(__file__).parent.resolve()
+lab_path = (HERE / "molstarview" / "labextension")
+nb_path = (HERE / "molstarview" / "nbextension")
+assert (nb_path/"index.js").exists(), "index.js not found in %s. Make sure to build the frontend assets and install the JupyterLab extension." % nb_path
+assert (lab_path/"package.json").exists(), "package.json not found in %s. Make sure to build the frontend assets and install the JupyterLab extension." % lab_path
+labext_name = "molstarview-widget"
+package_data_spec = {
+    labext_name: ["*"],
+}
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/molstarview-widget', 'molstarview/nbextension', '*.*'),
-    ('share/jupyter/labextensions/molstarview-widget', 'molstarview/labextension', '**'),
-    ('share/jupyter/labextensions/molstarview-widget', '.', 'install.json'),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'molstarview-widget.json'),
+    ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
+    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
+    ("share/jupyter/nbextensions/%s" % labext_name, str(nb_path), "**"),
+    ("etc/jupyter/nbconfig/notebook.d", str(HERE), "molstarview-widget.json"),
 ]
 
-cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
-cmdclass['jsdeps'] = combine_commands(
-    install_npm(js_dir, npm=['yarn'], build_cmd='build:prod'), ensure_targets(jstargets),
-)
+def pre_develop():
+    pass
+
+def pre_dist():
+    pass
+
+cmdclass = wrap_installers(pre_develop=pre_develop, pre_dist=pre_dist)
+data_files = get_data_files(data_files_spec)
 
 setup_args = dict(
-    name=name,
-    version=version,
+    name='molstarview',
+    version=get_version(pjoin('molstarview', '_version.py')),
     description='molstarview',
-    long_description=LONG_DESCRIPTION,
+    long_description='molstarview',
     include_package_data=True,
     install_requires=[
         'ipywidgets>=7.6.0',
@@ -52,6 +62,7 @@ setup_args = dict(
     packages=find_packages(),
     zip_safe=False,
     cmdclass=cmdclass,
+    data_files=data_files,
     author='Hai Nguyen',
     author_email='hainm.comp@gmail.com',
     url='https://github.com/molstar/molstarview-widget',
@@ -71,6 +82,8 @@ setup_args = dict(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
 )
 
 setup(**setup_args)

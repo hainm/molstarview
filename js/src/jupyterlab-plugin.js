@@ -1,15 +1,15 @@
-var nglview_js_widgets = require('./index');
+var molstarview_widget = require('./index');
 var base = require('@jupyter-widgets/base');
 
 
 module.exports = {
-  id: 'nglview-js-widgets',
+  id: 'molstarview-widget',
   requires: [base.IJupyterWidgetRegistry],
   activate: function(app, widgets) {
       widgets.registerWidget({
-          name: 'nglview-js-widgets',
-          version: nglview_js_widgets.version,
-          exports: nglview_js_widgets
+          name: 'molstarview-widget',
+          version: molstarview_widget.version,
+          exports: molstarview_widget
       });
     },
   autoStart: true

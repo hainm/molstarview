@@ -13,14 +13,14 @@
     "science",
     "widgets"
   ],
-  "homepage": "https://github.com/nglviewer/molstarview/js",
+  "homepage": "https://github.com/hainm/molstarview",
   "bugs": {
-    "url": "https://github.com/nglviewer/molstarview/issues"
+    "url": "https://github.com/hainm/molstarview/issues"
   },
   "license": "MIT",
   "author": {
-    "name": "Alexander Rose, Hai Nguyen",
-    "email": "alexander.rose@weirdbyte.de, hainm.comp@gmail.com"
+    "name": "Hai Nguyen",
+    "email": "hainm.comp@gmail.com"
   },
   "files": [
     "dist",
@@ -31,11 +31,11 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nglviewer/molstarview.git"
+    "url": "https://github.com/hainm/molstarview.git"
   },
   "scripts": {
     "prepublish": "yarn build:prod && webpack && yarn run copy:labextension",
-    "copy:labextension": "mkdir -p ../nglview/labextension && cp -r molstarview-widget/labextension/* ../nglview/labextension/",
+    "copy:labextension": "mkdir -p ../molstarview/labextension && cp -r molstarview-widget/labextension/* ../molstarview/labextension/",
     "build": "yarn run build:lib && yarn run build:labextension:dev",
     "build:prod": "yarn run build:lib && yarn run build:labextension",
     "build:labextension": "jupyter labextension build .",

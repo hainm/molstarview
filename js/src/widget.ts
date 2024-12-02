@@ -148,7 +148,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
 
     // from molstar: https://github.com/molstar/molstar/blob/d1e17785b8404eec280ad04a6285ad9429c5c9f3/src/apps/viewer/app.ts#L219-L223
     // this method is taken from the Viewer class
-    loadPdb(pdb) {    
+    loadPdb(pdb) {
         const params = molStructure.DownloadStructure.createDefaultParams(this.plugin.state.data.root.obj, this.plugin);
         const provider = this.plugin.config.get(PluginConfig.Download.DefaultPdbProvider);
         return this.plugin.runTask(this.plugin.state.data.applyAction(molStructure.DownloadStructure, {
@@ -300,7 +300,7 @@ var MolstarView = widgets.DOMWidgetView.extend({
                 for (var k in model.views){
                     var pview = model.views[k];
                     var view = await model.views[k]
-                    if !(view == that){
+                    if (!(view == that)){
                         view.setCamera(that.plugin.canvas3d.camera.getSnapshot())
                     }
                 }

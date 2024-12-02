@@ -30,7 +30,7 @@ module.exports = [
         entry: './lib/extension.js',
         output: {
             filename: 'extension.js',
-            path: path.resolve(__dirname, '..', 'nglview', 'nbextension'),
+            path: path.resolve(__dirname, '..', 'molstarview', 'nbextension'),
             libraryTarget: 'amd'
         },
         mode: 'production'
@@ -44,7 +44,7 @@ module.exports = [
         entry: './lib/index.js',
         output: {
             filename: 'index.js',
-            path: path.resolve(__dirname, '..', 'nglview', 'nbextension'),
+            path: path.resolve(__dirname, '..', 'molstarview', 'nbextension'),
             libraryTarget: 'amd'
         },
         devtool: 'source-map',
@@ -54,7 +54,7 @@ module.exports = [
         externals: ['@jupyter-widgets/base'],
         mode: 'production'
     },
-    {// Embeddable nglview bundle
+    {// Embeddable molstarview bundle
         //
         // This bundle is generally almost identical to the notebook bundle
         // containing the custom widget views and models.

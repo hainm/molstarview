@@ -1,7 +1,7 @@
 {
   "name": "molstarview-widget",
   "version": "3.1.5",
-  "description": "nglview-js-widgets",
+  "description": "molstarview-widget",
   "keywords": [
     "ipython",
     "ipywidgets",
@@ -35,7 +35,7 @@
   },
   "scripts": {
     "prepublish": "yarn build:prod && webpack && yarn run copy:labextension",
-    "copy:labextension": "mkdir -p ../nglview/labextension && cp -r nglview-js-widgets/labextension/* ../nglview/labextension/",
+    "copy:labextension": "mkdir -p ../nglview/labextension && cp -r molstarview-widget/labextension/* ../nglview/labextension/",
     "build": "yarn run build:lib && yarn run build:labextension:dev",
     "build:prod": "yarn run build:lib && yarn run build:labextension",
     "build:labextension": "jupyter labextension build .",
@@ -99,7 +99,7 @@
   "styleModule": "style/index.js",
   "jupyterlab": {
     "extension": "lib/jupyterlab-plugin",
-    "outputDir": "nglview-js-widgets/labextension",
+    "outputDir": "molstarview-widget/labextension",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,

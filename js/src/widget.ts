@@ -61,14 +61,14 @@ export class MolstarView extends widgets.DOMWidgetView  {
             }
             await this.finalizeDisplay();
         });
-    },
+    }
 
     async initializeDisplay() {
         this.setupContainer();
         this.plugin = await createPluginUI(this.container);
         this._focused = false;
         await this.checkLeaderView();
-    },
+    }
 
     setupContainer() {
         const container = document.createElement('div');
@@ -76,7 +76,7 @@ export class MolstarView extends widgets.DOMWidgetView  {
         container.style.height = '600px';
         this.el.appendChild(container);
         this.container = container;
-    },
+    }
 
     async checkLeaderView() {
         console.log('Find a leader view');
@@ -114,17 +114,17 @@ export class MolstarView extends widgets.DOMWidgetView  {
     }
 
     handleSignals() {
-        this.container.addEventListener('mouseover', (e: any) => {
-            this._focused = true;
-            e; // linter
-            this.mouseOverDisplay('block');
-        }, false);
+        // this.container.addEventListener('mouseover', (e: any) => {
+        //     this._focused = true;
+        //     e; // linter
+        //     this.mouseOverDisplay('block');
+        // }, false);
 
-        this.container.addEventListener('mouseout', (e: any) => {
-            this._focused = false;
-            e; // linter
-            this.mouseOverDisplay('none');
-        }, false);
+        // this.container.addEventListener('mouseout', (e: any) => {
+        //     this._focused = false;
+        //     e; // linter
+        //     this.mouseOverDisplay('none');
+        // }, false);
     }
 
     async finalizeDisplay() {
@@ -233,14 +233,14 @@ export class MolstarView extends widgets.DOMWidgetView  {
                 this.model._handle_comm_msg.call(this.model, msg);
             });
         }
-    },
+    }
 
     updateCoordinates(coordinates: any, modelIndex: any) {
         var component = 0; // FIXME
         if (coordinates && typeof component != 'undefined') {
             // FIXME: update
         }
-    },
+    }
 
     exportImage(modelId: any) {
         this.plugin.helpers.viewportScreenshot.getImageDataUri().then((data: string) => {
@@ -295,7 +295,7 @@ export class MolstarView extends widgets.DOMWidgetView  {
             that._synced_model_ids.forEach(async function(mid: any) {
                 var model = await that.model.widget_manager.get_model(mid) as MolstarModel;
                 for (var k in model.views) {
-                    var view = await model.views[k];
+                    var view = await model.views[k] as MolstarView;
                     if (view !== that) {
                         view.setCamera(that.plugin.canvas3d.camera.getSnapshot());
                     }
